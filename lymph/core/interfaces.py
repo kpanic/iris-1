@@ -37,6 +37,7 @@ class InterfaceBase(type):
         new_cls.declarations = declarations
         return new_cls
 
+
 class ProxyMethod(object):
     def __init__(self, func):
         self.func = func
@@ -51,16 +52,24 @@ class ProxyMethod(object):
 
 
 class Proxy(Component):
-    def __init__(self, container, address, timeout=30, namespace='', error_map=None):
+    def __init__(self, container, address, timeout=30, namespace='',
+                 error_map=None, context=None):
         self._container = container
         self._address = address
         self._method_cache = {}
         self._timeout = timeout
         self._namespace = namespace or address
         self._error_map = error_map or {}
+        self._context = context or {}
 
     def _call(self, __name, **kwargs):
-        channel = self._container.send_request(self._address, __name, kwargs)
+        context = kwargs.get('context', {})
+        context.update(self._context)
+        if context:
+            kwargs['context'] = context
+
+        channel = self._container.send_request(
+            self._address, __name, body=kwargs)
         try:
             return channel.get(timeout=self._timeout).body
         except RemoteError as e:
