@@ -37,6 +37,19 @@ The following options apply to all subcommands:
 ~~~~~~~~~~~~~~~~~~
 
 
+.. _cli-lymph-emit
+
+.. program:: lymph emit
+
+``lymph emit <event-type> <body>``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Emit an <event-type> with a <body> that would be available to be consumed from
+a consumer
+
+See :ref:`lymph-emit-and-subscribe-reference` for details.
+
+
 .. _cli-lymph-inspect:
 
 .. program:: lymph inspect
@@ -44,6 +57,7 @@ The following options apply to all subcommands:
 ``lymph inspect``
 ~~~~~~~~~~~~~~~~~
 
+Inspect the RPC methods related to a service
 
 
 .. _cli-lymph-instance:
@@ -84,16 +98,40 @@ This command takes the same commandline options as ``lymph instance``.
 
 .. program:: lymph request
 
-``lymph request``
+``lymph request <service_name>``
 ~~~~~~~~~~~~~~~~~
 
+Send an RPC call to a lymph service
+
+
+.. _cli-lymph-subscribe:
+
+.. program:: lymph subscribe
+
+``lymph subscribe <event-type>``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Subscribe to an event type and prints to standard output the <event-type> and
+the body of the event.
+
+See :ref:`lymph-emit-and-subscribe-reference` for details.
+
+.. _cli-lymph-tail
+
+.. program:: lymph tail
+
+``lymph tail <service-name>``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tail service output (like the unix ``tail -f`` command)
+Print to standard output the RPC calls of the <service-name>
 
 .. _cli-lymph-shell:
 
 ``lymph shell``
 ~~~~~~~~~~~~~~~
 
-Starts an interactive Python shell, locally or remotely.
+Start an interactive Python shell, locally or remotely.
 
 Locally:
 --------

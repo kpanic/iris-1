@@ -122,6 +122,7 @@ A simple example of a class emitting a signal with a simple event would be:
 		def emit_event(self):
 			self.emit('simple_event', {'article': 'foo', 'quantity': 5})
 
+.. _lymph-emit-and-subscribe-reference:
 
 Command line interface
 ~~~~~~~~~~~~~~~~~~~~~~

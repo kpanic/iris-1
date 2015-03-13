@@ -78,10 +78,10 @@ class RemoteTail(collections.Iterator):
 
 class TailCommand(Command):
     """
-    Usage: lymph tail [options] [--level=<level> | -l <level>] <address>...
+    Usage: lymph tail [options] [--level=<level> | -l <level>] <service-name>...
 
     Description:
-        Shows the log output of <address>
+        Shows the log output of <service-name>
 
     Tail Options:
       --level=<level>, -l <level>  Log level to subscribe to [default: INFO]
@@ -95,7 +95,7 @@ class TailCommand(Command):
         client = Client.from_config(self.config)
         tail = RemoteTail()
 
-        for address in self.args['<address>']:
+        for address in self.args['<service-name>']:
             connected = tail.subscribe_service(client.container.lookup(address))
             if not connected:
                 print("Couldn't connect to log endpoint of '%s'" % address)
