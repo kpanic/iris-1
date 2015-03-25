@@ -35,7 +35,8 @@ class ConfigObject(collections.Mapping):
 
     def create_instance(self, key, default_class=None, **kwargs):
         instance_config = self.get(key, {})
-        return self._create_instance(instance_config, default_class=default_class, **kwargs)
+        return self._create_instance(instance_config,
+                                     default_class=default_class, **kwargs)
 
     def _create_instance(self, instance_config, default_class=None, **kwargs):
         clspath = instance_config.get('class', default_class)
@@ -50,14 +51,16 @@ class ConfigObject(collections.Mapping):
 
     def get_instance(self, key, default_class=None, **kwargs):
         instance_data = self.get(key)
-        if isinstance(instance_data, six.string_types) and instance_data.startswith('dep:'):
+        if isinstance(instance_data,
+                      six.string_types) and instance_data.startswith('dep:'):
             _, dep_name = instance_data.split(':', 1)
             return self.get_dependency(dep_name, **kwargs)
 
         instance = self.root._instances_cache.get(key)
         if not instance:
-            instance = self._create_instance(
-                instance_data, default_class=default_class, **kwargs)
+            instance = self._create_instance(instance_data,
+                                             default_class=default_class,
+                                             **kwargs)
             self.root._instances_cache[key] = instance
         return instance
 

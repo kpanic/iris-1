@@ -55,8 +55,8 @@ class CliWrapper(object):
                     # According to sys.exit doc, any other object beside
                     # an integer or None result to an exit code equal to 1.
                     returncode = 1
-            return self.Result(
-                returncode or 0, stdout.getvalue(), stderr.getvalue())
+            return self.Result(returncode or 0, stdout.getvalue(),
+                               stderr.getvalue())
 
 
 class CliTestMixin(object):
@@ -81,7 +81,9 @@ class CliTestMixin(object):
         super(CliTestMixin, self).tearDown()
 
     def assert_lines_equal(self, cmd, lines, config=True):
-        expected_lines = set(line for line in textwrap.dedent(lines).splitlines() if line.strip())
+        expected_lines = set(line
+                             for line in textwrap.dedent(lines).splitlines()
+                             if line.strip())
         result = self.cli(cmd, config=config)
         self.assertEqual(result.returncode, 0)
         self.assertEqual(set(result.stdout.splitlines()), expected_lines)
@@ -121,10 +123,8 @@ class CliIntegrationTestCase(CliTestMixin, LymphIntegrationTestCase):
 
     def setUp(self):
         super(CliIntegrationTestCase, self).setUp()
-        client = KazooClient(
-            hosts=self.hosts,
-            handler=SequentialGeventHandler(),
-        )
+        client = KazooClient(hosts=self.hosts,
+                             handler=SequentialGeventHandler(),)
         self.registry = ZookeeperServiceRegistry(client)
         self.events = NullEventSystem()
 
@@ -133,14 +133,11 @@ class CliIntegrationTestCase(CliTestMixin, LymphIntegrationTestCase):
                 "class": "lymph.discovery.zookeeper:ZookeeperServiceRegistry",
                 "zkclient": 'dep:kazoo',
             },
-            "event_system": {
-                "class": "lymph.events.null:NullEventSystem",
-            },
+            "event_system": {"class": "lymph.events.null:NullEventSystem",},
             "dependencies": {
-                "kazoo": {
-                    "class": "kazoo.client:KazooClient",
-                    "hosts": self.hosts,
-                }
+                "kazoo":
+                {"class": "kazoo.client:KazooClient",
+                 "hosts": self.hosts,}
             }
         }
 

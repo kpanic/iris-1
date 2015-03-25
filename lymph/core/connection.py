@@ -20,7 +20,12 @@ IDLE = 'idle'
 
 
 class Connection(object):
-    def __init__(self, server, endpoint, heartbeat_interval=1, timeout=1, idle_timeout=10, unresponsive_disconnect=30, idle_disconnect=60):
+    def __init__(self, server, endpoint,
+                 heartbeat_interval=1,
+                 timeout=1,
+                 idle_timeout=10,
+                 unresponsive_disconnect=30,
+                 idle_disconnect=60):
         self.server = server
         self.endpoint = endpoint
         self.timeout = timeout
@@ -34,15 +39,17 @@ class Connection(object):
         self.idle_since = 0
         self.last_message = now
         self.created_at = now
-        self.heartbeat_samples = SampleWindow(100, factor=1000)  # milliseconds
+        self.heartbeat_samples = SampleWindow(100, factor=1000) # milliseconds
         self.explicit_heartbeat_count = 0
         self.status = UNKNOWN
 
         self.received_message_count = 0
         self.sent_message_count = 0
 
-        self.heartbeat_loop_greenlet = self.server.container.spawn(self.heartbeat_loop)
-        self.live_check_loop_greenlet = self.server.container.spawn(self.live_check_loop)
+        self.heartbeat_loop_greenlet = self.server.container.spawn(
+            self.heartbeat_loop)
+        self.live_check_loop_greenlet = self.server.container.spawn(
+            self.live_check_loop)
 
         self.pid = os.getpid()
 
@@ -93,16 +100,14 @@ class Connection(object):
                 self.set_status(RESPONSIVE)
 
     def log_stats(self):
-        roundtrip_stats = 'window (mean rtt={mean:.1f} ms; stddev rtt={stddev:.1f})'.format(**self.heartbeat_samples.stats)
-        roundtrip_total_stats = 'total (mean rtt={mean:.1f} ms; stddev rtt={stddev:.1f})'.format(**self.heartbeat_samples.total.stats)
-        logger.debug("pid=%s; %s; %s; phi=%.3f; ping/s=%.2f; status=%s" % (
-            self.pid,
-            roundtrip_stats,
-            roundtrip_total_stats,
-            self.phi,
-            self.explicit_heartbeat_count / max(1, time.monotonic() - self.created_at),
-            self.status,
-        ))
+        roundtrip_stats = 'window (mean rtt={mean:.1f} ms; stddev rtt={stddev:.1f})'.format(
+            **self.heartbeat_samples.stats)
+        roundtrip_total_stats = 'total (mean rtt={mean:.1f} ms; stddev rtt={stddev:.1f})'.format(
+            **self.heartbeat_samples.total.stats)
+        logger.debug("pid=%s; %s; %s; phi=%.3f; ping/s=%.2f; status=%s" %
+                     (self.pid, roundtrip_stats, roundtrip_total_stats, self.
+                      phi, self.explicit_heartbeat_count /
+                      max(1, time.monotonic() - self.created_at), self.status,))
 
     def close(self):
         if self.status == CLOSED:
@@ -127,7 +132,9 @@ class Connection(object):
     def is_alive(self):
         return self.status in (RESPONSIVE, IDLE)
 
-    def stats(self): # FIXME: rtt and phi should be recorded as summary/histogram for all connections
+    def stats(
+        self
+    ): # FIXME: rtt and phi should be recorded as summary/histogram for all connections
         return {
             'endpoint': self.endpoint,
             'rtt': self.heartbeat_samples.stats,

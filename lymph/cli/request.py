@@ -15,21 +15,25 @@ from lymph.client import Client
 from lymph.exceptions import LookupFailure, Timeout
 from lymph.cli.base import Command
 
-
 logger = logging.getLogger(__name__)
 
 
 def handle_request_errors(func):
+
     @functools.wraps(func)
     def decorated(*args, **kwargs):
         try:
             func(*args, **kwargs)
         except LookupFailure as e:
-            logger.error("The specified service name could not be found: %s: %s" % (type(e).__name__, e))
+            logger.error(
+                "The specified service name could not be found: %s: %s" %
+                (type(e).__name__, e))
             return 1
         except Timeout:
-            logger.error("The request timed out. Either the service is not available or busy.")
+            logger.error(
+                "The request timed out. Either the service is not available or busy.")
             return 1
+
     return decorated
 
 
@@ -87,19 +91,22 @@ class RequestCommand(Command):
         n_success = len(timings)
         n_timeout = len(timeouts)
         avg = sum(timings) / n_success
-        stddev = math.sqrt(sum((t - avg)**2 for t in timings)) / n_success
+        stddev = math.sqrt(sum((t - avg) ** 2 for t in timings)) / n_success
 
         print()
-        print('Requests per second:   %8.2f Hz  (#req=%s)' % (n_success / total_time, n_success))
+        print('Requests per second:   %8.2f Hz  (#req=%s)' %
+              (n_success / total_time, n_success))
         print('Mean time per request: %8.2f ms  (stddev=%.2f)' % (avg, stddev))
-        print('Timeout rate:          %8.2f %%   (#req=%s)' % (100 * n_timeout / float(n), n_timeout))
+        print('Timeout rate:          %8.2f %%   (#req=%s)' %
+              (100 * n_timeout / float(n), n_timeout))
         print('Total time:            %8.2f s' % total_time)
         print()
 
         print('Percentiles:')
         print('  0.0 %%   %8.2f ms (min)' % timings[0])
         for p in (50, 90, 95, 97, 98, 99, 99.5, 99.9):
-            print('%5.1f %%   %8.2f ms' % (p, timings[int(math.floor(0.01 * p * n_success))]))
+            print('%5.1f %%   %8.2f ms' %
+                  (p, timings[int(math.floor(0.01 * p * n_success))]))
         print('100.0 %%   %8.2f ms (max)' % timings[-1])
 
     @handle_request_errors
@@ -128,7 +135,6 @@ class RequestCommand(Command):
             return self._run_many_requests(request, N, C)
 
 
-
 class InspectCommand(Command):
     """
     Usage: lymph inspect [--ip=<address> | --guess-external-ip | -g] <address> [options]
@@ -147,15 +153,15 @@ class InspectCommand(Command):
     @handle_request_errors
     def run(self):
         client = Client.from_config(self.config)
-        result = client.request(self.args['<address>'], 'lymph.inspect', {}, timeout=5).body
+        result = client.request(self.args['<address>'], 'lymph.inspect', {},
+                                timeout=5).body
         print()
 
         for method in sorted(result['methods'], key=lambda m: m['name']):
             print("rpc {name}({params})\n    {help}\n".format(
                 name=self.terminal.red(method['name']),
                 params=', '.join(method['params']),
-                help='\n    '.join(textwrap.wrap(method['help'], 70)),
-            ))
+                help='\n    '.join(textwrap.wrap(method['help'], 70)),))
 
 
 class DiscoverCommand(Command):
@@ -186,12 +192,16 @@ class DiscoverCommand(Command):
                 interface_instances = client.container.lookup(interface_name)
                 if not interface_instances and self.args.get('--only-running'):
                     continue
-                print(u"%s [%s]" % (self.terminal.red(interface_name), len(interface_instances)))
+                print(
+                    u"%s [%s]" %
+                    (self.terminal.red(interface_name), len(interface_instances)))
                 if self.args.get('--instances'):
-                    instances = sorted(interface_instances, key=lambda d: d.identity)
+                    instances = sorted(interface_instances,
+                                       key=lambda d: d.identity)
                     for i, d in enumerate(interface_instances):
                         prefix = u'└─' if i == len(instances) - 1 else u'├─'
-                        print(u'%s [%s] %s' % (prefix, d.identity[:10], d.endpoint))
+                        print(u'%s [%s] %s' %
+                              (prefix, d.identity[:10], d.endpoint))
         else:
             print(u"No registered services found")
 
@@ -209,6 +219,7 @@ class SubscribeCommand(Command):
         event_type = self.args.get('<event-type>')
 
         class Subscriber(lymph.Interface):
+
             @lymph.event(*event_type)
             def on_event(self, event):
                 print('%s: %r' % (event.evt_type, event.body))

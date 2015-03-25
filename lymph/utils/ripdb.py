@@ -6,7 +6,6 @@ import six
 import socket
 import sys
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -17,14 +16,18 @@ class Ripdb(pdb.Pdb):
         * http://blog.ionelmc.ro/2013/06/05/python-debugging-tools/
 
     """
+
     def __init__(self, port=0):
         self.old_stdout = sys.stdout
         self.old_stdin = sys.stdin
         self.listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.listen_socket.bind(('0.0.0.0', port))
         if not port:
-            logger.critical("PDB remote session open on: %s", self.listen_socket.getsockname())
-            six.print_("PDB remote session open on:", self.listen_socket.getsockname(), file=sys.__stderr__)
+            logger.critical("PDB remote session open on: %s",
+                            self.listen_socket.getsockname())
+            six.print_("PDB remote session open on:",
+                       self.listen_socket.getsockname(),
+                       file=sys.__stderr__)
             sys.stderr.flush()
         self.listen_socket.listen(1)
         self.connected_socket, address = self.listen_socket.accept()

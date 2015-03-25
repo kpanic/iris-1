@@ -1,6 +1,5 @@
 from lymph.cli.base import Command, get_command_classes, get_command_class, format_docstring
 
-
 HELP = 'Usage: lymph [options] <command> [<args>...]'
 
 TEMPLATE = HELP + """
@@ -40,10 +39,7 @@ def _format_help(name, description, indent='  ', spaces=13, min_spaces=2):
 
     """
     if spaces - len(name) < min_spaces:
-        return '\n'.join([
-            indent + name,
-            indent + (' ' * spaces) + description
-        ])
+        return '\n'.join([indent + name, indent + (' ' * spaces) + description])
     else:
         return indent + name + (' ' * (spaces - len(name))) + description
 
@@ -73,4 +69,3 @@ class HelpCommand(Command):
             print(get_command_class(name).get_help())
         else:
             print(self.description)
-

@@ -1,5 +1,3 @@
-
-
 def patch():
     if patch._initialized:
         return
@@ -13,6 +11,8 @@ def patch():
         _py2_patches()
 
     _export()
+
+
 patch._initialized = False
 
 
@@ -25,9 +25,10 @@ def _export():
     from lymph.core.interfaces import Interface
     from lymph.core.declarations import proxy
 
-    for obj in (RpcError, LookupFailure, Timeout, rpc, raw_rpc, event, Interface, proxy):
+    for obj in (RpcError, LookupFailure, Timeout, rpc, raw_rpc, event,
+                Interface, proxy):
         setattr(lymph, obj.__name__, obj)
 
 
 def _py2_patches():
-    import monotime  # NOQA
+    import monotime # NOQA

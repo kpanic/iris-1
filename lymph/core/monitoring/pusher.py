@@ -9,9 +9,7 @@ from lymph.core.components import Component
 from lymph.core.monitoring.metrics import Metrics
 from lymph.core.monitoring.global_metrics import RUsageMetrics, GeventMetrics, GarbageCollectionMetrics
 
-
 logger = logging.getLogger(__name__)
-
 
 DEFAULT_MONITOR_ENDPOINT = 'tcp://127.0.0.1:44044'
 
@@ -48,9 +46,6 @@ class MonitorPusher(Component):
             gevent.sleep(self.interval)
             dt = time.monotonic() - last_stats
             series = list(self.aggregate)
-            stats = {
-                'time': time.time(),
-                'series': series,
-            }
+            stats = {'time': time.time(), 'series': series,}
             last_stats += dt
             self.socket.send_multipart([b'stats', msgpack.dumps(stats)])

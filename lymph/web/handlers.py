@@ -3,12 +3,10 @@ import json
 
 from werkzeug.exceptions import MethodNotAllowed
 
-
 http_methods = ('get', 'post', 'head', 'options', 'put', 'delete')
 
 
 class RequestHandler(object):
-
     def __init__(self, interface, request):
         self.request = request
         self.interface = interface
@@ -16,7 +14,8 @@ class RequestHandler(object):
 
     @property
     def allowed_methods(self):
-        return [method.upper() for method in http_methods if callable(getattr(self, method, None))]
+        return [method.upper() for method in http_methods
+                if callable(getattr(self, method, None))]
 
     def json(self):
         if not "application/json" == self.request.mimetype:

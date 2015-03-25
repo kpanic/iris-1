@@ -41,10 +41,9 @@ class PubLogHandler(logging.Handler):
 
     def emit(self, record):
         topic = record.levelname
-        self.socket.send_multipart([
-            self._encode(topic),
-            self._encode(self.endpoint),
-            self._encode(self.format(record))])
+        self.socket.send_multipart([self._encode(topic),
+                                    self._encode(self.endpoint),
+                                    self._encode(self.format(record))])
 
     @staticmethod
     def _encode(potentially_text, encoding='utf-8'):
@@ -65,7 +64,8 @@ def setup_logging(config, loglevel, logfile):
     if not log_endpoint:
         ctx = zmq.Context.instance()
         log_socket = ctx.socket(zmq.PUB)
-        log_endpoint, port = bind_zmq_socket(log_socket, config.get('container.ip'))
+        log_endpoint, port = bind_zmq_socket(log_socket,
+                                             config.get('container.ip'))
 
         config.set('container.log_endpoint', log_endpoint)
 
@@ -73,7 +73,8 @@ def setup_logging(config, loglevel, logfile):
     formatters = logconf.setdefault('formatters', {})
     formatters.setdefault('_trace', {
         '()': 'lymph.core.trace.TraceFormatter',
-        'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s - trace_id="%(trace_id)s"',
+        'format':
+        '%(asctime)s [%(levelname)s] %(name)s: %(message)s - trace_id="%(trace_id)s"',
     })
     handlers = logconf.setdefault('handlers', {})
     handlers.setdefault('_zmqpub', {
@@ -88,14 +89,12 @@ def setup_logging(config, loglevel, logfile):
         'level': loglevel.upper(),
     }
     if logfile:
-        console_logconf.update({
-            'class': 'logging.FileHandler',
-            'filename': logfile
-        })
+        console_logconf.update(
+            {'class': 'logging.FileHandler',
+             'filename': logfile})
     handlers.setdefault('_console', console_logconf)
     loggers = logconf.setdefault('loggers', {})
-    loggers.setdefault('lymph', {
-        'handlers': ['_console', '_zmqpub'],
-        'level': 'DEBUG',
-    })
+    loggers.setdefault(
+        'lymph', {'handlers': ['_console', '_zmqpub'],
+                  'level': 'DEBUG',})
     dictConfig(logconf)

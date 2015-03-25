@@ -3,15 +3,9 @@ import gc
 import resource
 import gevent
 
-
-RUSAGE_ATTRS = (
-    'utime', 'stime',
-    'maxrss', 'ixrss', 'idrss', 'isrss',
-    'minflt', 'majflt', 'nswap',
-    'inblock', 'oublock',
-    'msgsnd', 'msgrcv',
-    'nsignals', 'nvcsw', 'nivcsw',
-)
+RUSAGE_ATTRS = ('utime', 'stime', 'maxrss', 'ixrss', 'idrss', 'isrss', 'minflt',
+                'majflt', 'nswap', 'inblock', 'oublock', 'msgsnd', 'msgrcv',
+                'nsignals', 'nvcsw', 'nivcsw',)
 
 
 class GlobalMetrics(object):
@@ -21,7 +15,8 @@ class GlobalMetrics(object):
 
 class RUsageMetrics(GlobalMetrics):
     def __init__(self, name='rusage'):
-        self.attr_map = [('ru_{}'.format(attr), '{}.{}'.format(name, attr)) for attr in RUSAGE_ATTRS]
+        self.attr_map = [('ru_{}'.format(attr), '{}.{}'.format(name, attr))
+                         for attr in RUSAGE_ATTRS]
 
     def __iter__(self):
         ru = resource.getrusage(resource.RUSAGE_SELF)
@@ -51,5 +46,3 @@ class GeventMetrics(GlobalMetrics):
         yield 'gevent.active', loop.activecnt, {}
         yield 'gevent.pending', loop.pendingcnt, {}
         yield 'gevent.depth', loop.depth, {}
-
-

@@ -5,7 +5,6 @@ import gevent
 
 from lymph.contrib.gpool import NonBlockingPool
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -17,7 +16,6 @@ def get_trace(greenlet=None):
 
 
 class GreenletWithTrace(gevent.Greenlet):
-
     def __init__(self, *args, **kwargs):
         super(GreenletWithTrace, self).__init__(*args, **kwargs)
         self._lymph_trace = get_trace().copy()

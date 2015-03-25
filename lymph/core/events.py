@@ -5,12 +5,14 @@ from uuid import uuid4
 from lymph.core.interfaces import Component
 from lymph.core import trace
 
-
 logger = logging.getLogger(__name__)
 
 
 class Event(object):
-    def __init__(self, evt_type, body, source=None, headers=None, event_id=None):
+    def __init__(self, evt_type, body,
+                 source=None,
+                 headers=None,
+                 event_id=None):
         self.event_id = event_id
         self.evt_type = evt_type
         self.body = body
@@ -31,7 +33,9 @@ class Event(object):
 
     @classmethod
     def deserialize(cls, data):
-        return cls(data.get('type'), data.get('body', {}), source=data.get('source'), headers=data.get('headers'))
+        return cls(data.get('type'), data.get('body', {}),
+                   source=data.get('source'),
+                   headers=data.get('headers'))
 
     def serialize(self):
         return {
@@ -43,7 +47,11 @@ class Event(object):
 
 
 class EventHandler(Component):
-    def __init__(self, interface, func, event_types, sequential=False, queue_name=None, active=True, once=False):
+    def __init__(self, interface, func, event_types,
+                 sequential=False,
+                 queue_name=None,
+                 active=True,
+                 once=False):
         super(EventHandler, self).__init__()
         self.func = func
         self.event_types = event_types
@@ -57,7 +65,8 @@ class EventHandler(Component):
     @property
     def queue_name(self):
         if self.unique_key:
-            return '%s-%s-%s' % (self.interface.name, self._queue_name, self.unique_key)
+            return '%s-%s-%s' % (self.interface.name, self._queue_name, self.
+                                 unique_key)
         else:
             return '%s-%s' % (self.interface.name, self._queue_name)
 
@@ -75,25 +84,19 @@ class EventHandler(Component):
 
 
 class EventDispatcher(object):
-    wildcards = {
-        '#': r'[\w.]*(?=\.|$)',
-        '*': r'\w+',
-    }
+    wildcards = {'#': r'[\w.]*(?=\.|$)', '*': r'\w+',}
 
     def __init__(self, patterns=()):
         self.patterns = []
         self.update(patterns)
 
     def compile(self, key):
-        words = (self.wildcards.get(word, re.escape(word)) for word in key.split('.'))
+        words = (self.wildcards.get(word, re.escape(word))
+                 for word in key.split('.'))
         return re.compile('^%s$' % r'\.'.join(words))
 
     def register(self, pattern, handler):
-        self.patterns.append((
-            self.compile(pattern),
-            pattern,
-            handler,
-        ))
+        self.patterns.append((self.compile(pattern), pattern, handler,))
 
     def __iter__(self):
         for regex, pattern, handler in self.patterns:
@@ -115,4 +118,3 @@ class EventDispatcher(object):
                 handlers.add(handler)
                 handler(event)
         return bool(handlers)
-

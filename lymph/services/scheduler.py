@@ -21,11 +21,10 @@ class Scheduler(Interface):
 
     @rpc()
     def schedule(self, eta, event_type, payload):
-        self.redis.zadd(self.schedule_key, eta, msgpack.dumps({
-            'id': make_id(),
-            'event_type': event_type,
-            'payload': payload,
-        }))
+        self.redis.zadd(self.schedule_key, eta, msgpack.dumps(
+            {'id': make_id(),
+             'event_type': event_type,
+             'payload': payload,}))
 
     def loop(self):
         while True:

@@ -8,8 +8,8 @@ import netifaces
 def guess_external_ip():
     gateways = netifaces.gateways()
     try:
-         ifnet = gateways['default'][netifaces.AF_INET][1]
-         return netifaces.ifaddresses(ifnet)[netifaces.AF_INET][0]['addr']
+        ifnet = gateways['default'][netifaces.AF_INET][1]
+        return netifaces.ifaddresses(ifnet)[netifaces.AF_INET][0]['addr']
     except (KeyError, IndexError):
         return
 
@@ -33,8 +33,12 @@ def bind_zmq_socket(sock, address, port=None):
 
 
 # adapted from https://github.com/mozilla-services/chaussette/
-def create_socket(host, family=socket.AF_INET, type=socket.SOCK_STREAM,
-                  backlog=2048, blocking=True, inheritable=False):
+def create_socket(host,
+                  family=socket.AF_INET,
+                  type=socket.SOCK_STREAM,
+                  backlog=2048,
+                  blocking=True,
+                  inheritable=False):
     if family == socket.AF_UNIX and not host.startswith('unix:'):
         raise ValueError('Your host needs to have the unix:/path form')
     if host.startswith('unix:'):
@@ -76,11 +80,12 @@ def create_socket(host, family=socket.AF_INET, type=socket.SOCK_STREAM,
     return sock
 
 
-def get_unused_port(host="127.0.0.1", family=socket.AF_INET, socktype=socket.SOCK_STREAM):
+def get_unused_port(host="127.0.0.1",
+                    family=socket.AF_INET,
+                    socktype=socket.SOCK_STREAM):
     tempsock = socket.socket(family, socktype)
     tempsock.bind((host, 0))
     port = tempsock.getsockname()[1]
     tempsock.close()
     del tempsock
     return port
-

@@ -12,18 +12,19 @@ def setup_config(args):
     from lymph.config import Configuration
     from lymph.utils.sockets import guess_external_ip
 
-    config = Configuration({
-        'container': {}
-    })
+    config = Configuration({'container': {}})
 
     if 'LYMPH_NODE_CONFIG' in os.environ:
-        config.load_file(os.environ['LYMPH_NODE_CONFIG'], sections=['registry', 'event_system', 'plugins', 'dependencies'])
+        config.load_file(os.environ['LYMPH_NODE_CONFIG'],
+                         sections=['registry', 'event_system', 'plugins',
+                                   'dependencies'])
 
     config_file = args.get('--config') or '.lymph.yml'
     config.load_file(config_file)
     config.source = config_file
 
-    config.setdefault('container.ip', os.environ.get('LYMPH_NODE_IP', '127.0.0.1'))
+    config.setdefault('container.ip', os.environ.get('LYMPH_NODE_IP',
+                                                     '127.0.0.1'))
     ip = args.get('--ip')
     if args.get('--guess-external-ip'):
         if ip:
@@ -52,7 +53,8 @@ def setup_terminal(args, config):
 
 def _excepthook(type, value, tb):
     logger = logging.getLogger('lymph')
-    logger.log(logging.CRITICAL, 'Uncaught exception', exc_info=(type, value, tb))
+    logger.log(logging.CRITICAL, 'Uncaught exception',
+               exc_info=(type, value, tb))
 
 
 def main(argv=None):
@@ -71,7 +73,9 @@ def main(argv=None):
     try:
         command_cls = get_command_class(name)
     except KeyError:
-        print("'%s' is not a valid lymph command. See 'lymph list' or 'lymph --help'." % name)
+        print(
+            "'%s' is not a valid lymph command. See 'lymph list' or 'lymph --help'."
+            % name)
         return 1
     command_args = docopt.docopt(command_cls.get_help(), [name] + argv)
     args.update(command_args)

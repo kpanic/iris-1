@@ -1,4 +1,3 @@
-
 # This file is just Python, with a touch of Django which means you
 # you can inherit and tweak settings to your hearts content.
 from sentry.conf.server import *
@@ -12,24 +11,17 @@ DATABASES = {
         # You can swap out the engine for MySQL easily by changing this value
         # to ``django.db.backends.mysql`` or to PostgreSQL with
         # ``django.db.backends.postgresql_psycopg2``
-
         # If you change this, you'll also need to install the appropriate python
         # package: psycopg2 (Postgres) or mysql-python
-        'ENGINE': 'django.db.backends.sqlite3',
-
-        'NAME': os.path.join(CONF_ROOT, 'sentry.db'),
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-
+        'ENGINE': 'django.db.backends.sqlite3', 'NAME': os.path.join(
+            CONF_ROOT, 'sentry.db'), 'USER': 'postgres', 'PASSWORD': '', 'HOST':
+        '', 'PORT': '',
         # If you're using Postgres, we recommend turning on autocommit
         # 'OPTIONS': {
         #     'autocommit': True,
         # }
     }
 }
-
 
 # If you're expecting any kind of real traffic on Sentry, we highly recommend
 # configuring the CACHES and Redis settings
@@ -87,20 +79,19 @@ DATABASES = {
 ################
 
 # You MUST configure the absolute URI root for Sentry:
-SENTRY_URL_PREFIX = 'http://127.0.0.1:9009'  # No trailing slash!
+SENTRY_URL_PREFIX = 'http://127.0.0.1:9009' # No trailing slash!
 
 # If you're using a reverse proxy, you should enable the X-Forwarded-Proto
 # and X-Forwarded-Host headers, and uncomment the following settings
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # USE_X_FORWARDED_HOST = True
 
-
 ALLOWED_HOSTS = ['127.0.0.1']
 SENTRY_WEB_HOST = '127.0.0.1'
 SENTRY_WEB_PORT = 9009
 SENTRY_WEB_OPTIONS = {
-    'workers': 3,  # the number of gunicorn workers
-    'limit_request_line': 0,  # required for raven-js
+    'workers': 3, # the number of gunicorn workers
+    'limit_request_line': 0, # required for raven-js
     'secure_scheme_headers': {'X-FORWARDED-PROTO': 'https'},
 }
 

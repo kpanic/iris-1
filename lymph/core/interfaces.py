@@ -53,7 +53,10 @@ class ProxyMethod(object):
 
 
 class Proxy(Component):
-    def __init__(self, container, address, timeout=30, namespace='', error_map=None):
+    def __init__(self, container, address,
+                 timeout=30,
+                 namespace='',
+                 error_map=None):
         self._container = container
         self._address = address
         self._method_cache = {}
@@ -75,7 +78,8 @@ class Proxy(Component):
         try:
             return self._method_cache[name]
         except KeyError:
-            method = ProxyMethod(functools.partial(self._call, '%s.%s' % (self._namespace, name)))
+            method = ProxyMethod(functools.partial(self._call, '%s.%s' %
+                                                   (self._namespace, name)))
             self._method_cache[name] = method
             return method
 
@@ -111,6 +115,7 @@ class Interface(Componentized):
             handler = EventHandler(self, func, event_types, **kwargs)
             self.container.subscribe(handler)
             return handler
+
         return decorator
 
     def get_next_event(self, *event_types, **kwargs):
@@ -150,13 +155,12 @@ class DefaultInterface(Interface):
         Returns a description of all available rpc methods of this service
         """
         methods = []
-        for interface_name, interface in list(self.container.installed_interfaces.items()):
+        for interface_name, interface in list(
+            self.container.installed_interfaces.items()):
             for name, func in six.iteritems(interface.methods):
                 methods.append({
                     'name': '%s.%s' % (interface_name, name),
                     'params': list(func.args.args),
                     'help': textwrap.dedent(func.__doc__ or '').strip(),
                 })
-        return {
-            'methods': methods,
-        }
+        return {'methods': methods,}

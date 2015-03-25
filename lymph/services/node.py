@@ -11,7 +11,6 @@ from lymph.core.interfaces import Interface
 from lymph.core.monitoring.metrics import Metrics
 from lymph.utils.sockets import create_socket
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -26,8 +25,7 @@ class Process(object):
         return self._process and self._process.is_running()
 
     def start(self):
-        self._popen = subprocess.Popen(
-            self.cmd, env=self.env, close_fds=False)
+        self._popen = subprocess.Popen(self.cmd, env=self.env, close_fds=False)
         self._process = psutil.Process(self._popen.pid)
 
     def stop(self, **kwargs):
@@ -72,7 +70,8 @@ class Node(Interface):
 
     def apply_config(self, config):
         for name, c in six.iteritems(config.get('instances', {})):
-            self._services.append((name, c.get('command'), c.get('numprocesses', 1)))
+            self._services.append((name, c.get('command'), c.get('numprocesses',
+                                                                 1)))
 
         socket_config = config.get_raw('sockets', ())
         if isinstance(socket_config, dict):
@@ -83,7 +82,9 @@ class Node(Interface):
     def on_start(self):
         self.create_shared_sockets()
         self.running = True
-        shared_fds = json.dumps({port: s.fileno() for port, s in six.iteritems(self.sockets)})
+        shared_fds = json.dumps(
+            {port: s.fileno()
+             for port, s in six.iteritems(self.sockets)})
         for service_type, cmd, num in self._services:
             env = os.environ.copy()
             env.update({
@@ -112,8 +113,9 @@ class Node(Interface):
 
     def create_shared_sockets(self):
         for host, port in self._sockets:
-            sock = create_socket(
-                '%s:%s' % (host or self.container.server.ip, port), inheritable=True)
+            sock = create_socket('%s:%s' %
+                                 (host or self.container.server.ip, port),
+                                 inheritable=True)
             self.sockets[port] = sock
 
     def restart_all(self):
@@ -133,4 +135,3 @@ class Node(Interface):
                     if self.running:
                         process.restart()
             gevent.sleep(1)
-

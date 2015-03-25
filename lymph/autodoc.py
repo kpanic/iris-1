@@ -38,7 +38,9 @@ class RPCInterfaceDocumenter(ClassDocumenter):
 
     @classmethod
     def can_document_member(cls, member, membername, isattr, parent):
-        document = super(RPCInterfaceDocumenter, cls).can_document_member(member, membername, isattr, parent)
+        document = super(RPCInterfaceDocumenter,
+                         cls).can_document_member(member, membername, isattr,
+                                                  parent)
         return document and issubclass(member, lymph.Interface)
 
     def format_args(self):
@@ -49,7 +51,8 @@ class RPCInterfaceDocumenter(ClassDocumenter):
 
     def filter_members(self, members, want_all):
         """Filter interface attribute to only document RPC methods."""
-        members = super(RPCInterfaceDocumenter, self).filter_members(members, want_all)
+        members = super(RPCInterfaceDocumenter, self).filter_members(members,
+                                                                     want_all)
         ret = []
         for name, obj, isattr in members:
             if isinstance(obj, RPCBase):

@@ -6,6 +6,7 @@ from lymph.core.components import Component
 
 @six.add_metaclass(abc.ABCMeta)
 class BaseEventSystem(Component):
+
     @classmethod
     def from_config(cls, config, **kwargs):
         return cls(**kwargs)

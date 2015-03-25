@@ -59,7 +59,8 @@ class RemoteTail(collections.Iterator):
         Return: True if subscription worked else false.
 
         """
-        service.observe([services.ADDED, services.REMOVED], self._on_status_change)
+        service.observe([services.ADDED, services.REMOVED],
+                        self._on_status_change)
 
         connected = False
         for instance in service:
@@ -73,7 +74,7 @@ class RemoteTail(collections.Iterator):
         topic, endpoint, msg = self._sock.recv_multipart()
         return self.Entry(topic, self._instances[endpoint], msg)
 
-    __next__ = next  # For python3.
+    __next__ = next # For python3.
 
 
 class TailCommand(Command):
@@ -108,7 +109,8 @@ class TailCommand(Command):
         logger.setLevel(level)
         console = logging.StreamHandler()
         console.setLevel(level)
-        console.setFormatter(logging.Formatter('[%(service_type)s][%(identity)s] [%(levelname)s] %(message)s'))
+        console.setFormatter(logging.Formatter(
+            '[%(service_type)s][%(identity)s] [%(levelname)s] %(message)s'))
         logger.addHandler(console)
 
         try:

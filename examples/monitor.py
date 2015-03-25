@@ -17,11 +17,11 @@ from werkzeug.wrappers import Response
 class Monitor(WebServiceInterface):
     http_port = 4044
 
-    url_map = Map([
-        Rule('/', endpoint='index'),
-        Rule('/static/<path:path>', endpoint='static_resource'),
-        Rule('/api/stats/', endpoint='get_stats'),
-    ])
+    url_map = Map([Rule('/',
+                        endpoint='index'), Rule('/static/<path:path>',
+                                                endpoint='static_resource'),
+                   Rule('/api/stats/',
+                        endpoint='get_stats'),])
 
     def on_start(self):
         self._stats = {}
@@ -41,7 +41,7 @@ class Monitor(WebServiceInterface):
                 key = data['endpoint'], conn['endpoint']
                 try:
                     conn_stats = self._stats[key]
-                except KeyError:    
+                except KeyError:
                     conn_stats = collections.deque(maxlen=100)
                     self._stats[key] = conn_stats
                 conn_stats.append((data['time'], conn['rtt']['mean']))
@@ -61,7 +61,8 @@ class Monitor(WebServiceInterface):
         for key, series in six.iteritems(self._stats):
             data.append({
                 'name': u'–'.join(key),
-                'data': [dict(x=t, y=hb) for t, hb in series],
+                'data': [dict(x=t,
+                              y=hb) for t, hb in series],
             })
             i += 1
             #for t, hb in series:

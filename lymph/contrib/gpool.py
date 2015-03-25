@@ -26,11 +26,13 @@ class NonBlockingPool(Pool):
         self._timeout = timeout
 
     def add(self, greenlet):
-        acquired = self._semaphore.acquire(blocking=False, timeout=self._timeout)
+        acquired = self._semaphore.acquire(blocking=False,
+                                           timeout=self._timeout)
         # XXX(Mouad): Checking directly for False because DummySemaphore always
         # return None https://github.com/gevent/gevent/pull/544.
         if acquired is False:
-            raise RejectExcecutionError('No more resource available to run %r' % greenlet)
+            raise RejectExcecutionError(
+                'No more resource available to run %r' % greenlet)
         try:
             super(NonBlockingPool, self).add(greenlet)
         except:

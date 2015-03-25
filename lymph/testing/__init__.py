@@ -30,7 +30,8 @@ def get_side_effect(mocks):
             try:
                 result = self.data[name]
                 if isinstance(result, Exception):
-                    raise getattr(RemoteError, result.__class__.__name__)('', '')
+                    raise getattr(RemoteError, result.__class__.__name__)('',
+                                                                          '')
                 if callable(result):
                     return result(**kwargs)
                 return result
@@ -39,6 +40,7 @@ def get_side_effect(mocks):
 
         def update(self, func_name, new_value):
             self.data[func_name] = new_value
+
     return ProxyCall(mocks)
 
 
@@ -75,7 +77,8 @@ class MockServiceNetwork(object):
         kwargs.setdefault('port', self.next_port)
         self.next_port += 1
         registry = self.discovery_hub.create_registry()
-        container = MockServiceContainer(registry=registry, events=self.events, **kwargs)
+        container = MockServiceContainer(registry=registry,
+                                         events=self.events, **kwargs)
         container.install_interface(cls, name=interface_name)
         self.service_containers[container.endpoint] = container
         container._mock_network = self
@@ -170,7 +173,11 @@ class LymphIntegrationTestCase(KazooTestHarness):
     def create_event_system(self, **kwargs):
         return self.events
 
-    def create_container(self, interface_cls=None, interface_name=None, events=None, registry=None, **kwargs):
+    def create_container(self,
+                         interface_cls=None,
+                         interface_name=None,
+                         events=None,
+                         registry=None, **kwargs):
         if not events:
             events = self.create_event_system(**kwargs)
         if not registry:
@@ -178,7 +185,8 @@ class LymphIntegrationTestCase(KazooTestHarness):
         container = ServiceContainer(events=events, registry=registry, **kwargs)
         interface = None
         if interface_cls:
-            interface = container.install_interface(interface_cls, name=interface_name)
+            interface = container.install_interface(interface_cls,
+                                                    name=interface_name)
         container.start()
         self._containers.append(container)
         return container, interface
@@ -201,19 +209,14 @@ class LymphServiceTestCase(unittest.TestCase):
         self.network = MockServiceNetwork()
         self.service_container = self.network.add_service(
             self.service_class,
-            interface_name=self.service_name
-        )
-        self.service = self.service_container.installed_interfaces[
-            self.service_name
-        ]
+            interface_name=self.service_name)
+        self.service = self.service_container.installed_interfaces[self.
+                                                                   service_name]
         self.service.apply_config(self.service_config)
         self.client_container = self.network.add_service(
             self.client_class,
-            interface_name=self.client_name
-        )
-        self.client = self.client_container.installed_interfaces[
-            self.client_name
-        ]
+            interface_name=self.client_name)
+        self.client = self.client_container.installed_interfaces[self.client_name]
         self.client.apply_config(self.client_config)
         self.network.start()
 
@@ -234,7 +237,8 @@ class APITestCase(unittest.TestCase):
         if not self.interface_name:
             self.interface_name = self.test_interface.__name__.lower()
 
-        container = self.network.add_service(self.test_interface, interface_name=self.interface_name)
+        container = self.network.add_service(self.test_interface,
+                                             interface_name=self.interface_name)
 
         webinterface_object = container.installed_interfaces[self.interface_name]
         self.network.start()

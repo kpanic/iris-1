@@ -10,7 +10,6 @@ from lymph.core.declarations import Declaration
 from lymph.core.events import Event
 from lymph.core.interfaces import Component
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -23,13 +22,17 @@ def serial_event(*event_types, **kwargs):
             zkclient = interface.config.root.get_instance(
                 'components.SerialEventHandler.zkclient',
                 handler=SequentialGeventHandler())
-            return SerialEventHandler(zkclient, interface, func, event_types, **kwargs)
+            return SerialEventHandler(zkclient, interface, func, event_types,
+                                      **kwargs)
+
         return Declaration(factory)
+
     return decorator
 
 
 class SerialEventHandler(Component):
-    def __init__(self, zkclient, interface, func, event_types, key, partition_count=12):
+    def __init__(self, zkclient, interface, func, event_types, key,
+                 partition_count=12):
         self.zk = zkclient
         self.interface = interface
         self.partition_count = partition_count
@@ -39,16 +42,23 @@ class SerialEventHandler(Component):
         self.name = '%s.%s' % (interface.name, func.__name__)
 
         def _consume(interface, event):
-            self.consumer_func(self.interface, Event.deserialize(event['event']))
+            self.consumer_func(self.interface,
+                               Event.deserialize(event['event']))
 
         for i in range(partition_count):
             queue = self.get_queue_name(i)
-            e = lymph.event(queue, queue_name=queue, sequential=True, active=False)(_consume)
+            e = lymph.event(queue,
+                            queue_name=queue,
+                            sequential=True,
+                            active=False)(_consume)
             handler = e.install(interface)
-            self.consumers[handler] = interface.container.subscribe(handler, consume=False)
+            self.consumers[handler] = interface.container.subscribe(
+                handler,
+                consume=False)
         self.partition = set()
         push_queue = self.get_queue_name('push')
-        lymph.event(*event_types, queue_name=push_queue)(self.push).install(interface)
+        lymph.event(*event_types,
+                    queue_name=push_queue)(self.push).install(interface)
 
     def on_start(self):
         super(SerialEventHandler, self).on_start()
@@ -65,7 +75,8 @@ class SerialEventHandler(Component):
         key = str(self.key(interface, event))
         index = int(hashlib.md5(key).hexdigest(), 16) % self.partition_count
         logger.debug('PUBLISH %s %s', self.get_queue_name(index), event)
-        self.interface.emit(self.get_queue_name(index), {'event': event.serialize()})
+        self.interface.emit(self.get_queue_name(index),
+                            {'event': event.serialize()})
 
     def start(self):
         self.running = True
@@ -77,8 +88,7 @@ class SerialEventHandler(Component):
             partitioner = self.zk.SetPartitioner(
                 path='/lymph/serial_event_partitions/%s' % self.name,
                 set=self.consumers.keys(),
-                time_boundary=1,
-            )
+                time_boundary=1,)
             while True:
                 if partitioner.failed:
                     logger.error('partitioning failed')
@@ -103,7 +113,8 @@ class SerialEventHandler(Component):
         for queue in partition - self.partition:
             self.start_consuming(queue)
         if partition != self.partition:
-            logger.info('partition: %s', ', '.join(h.queue_name for h in partition))
+            logger.info('partition: %s', ', '.join(h.queue_name
+                                                   for h in partition))
         self.partition = partition
 
     def start_consuming(self, handler):

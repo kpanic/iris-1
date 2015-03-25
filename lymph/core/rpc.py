@@ -16,7 +16,6 @@ from lymph.core.messages import Message
 from lymph.core import trace
 from lymph.exceptions import NotConnected
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +46,8 @@ class ZmqRPCServer(Component):
 
     def _bind(self, max_retries=2, retry_delay=0):
         if self.bound:
-            raise TypeError('this container is already bound (endpoint=%s)', self.endpoint)
+            raise TypeError('this container is already bound (endpoint=%s)',
+                            self.endpoint)
         self.send_sock = self.zctx.socket(zmq.ROUTER)
         self.recv_sock = self.zctx.socket(zmq.ROUTER)
         port = self.port
@@ -64,7 +64,9 @@ class ZmqRPCServer(Component):
             except zmq.ZMQError as e:
                 if e.errno != errno.EADDRINUSE or retries >= max_retries:
                     raise
-                logger.info('failed to bind to port %s (errno=%s), trying again.', port, e.errno)
+                logger.info(
+                    'failed to bind to port %s (errno=%s), trying again.', port,
+                    e.errno)
                 retries += 1
                 if retry_delay:
                     gevent.sleep(retry_delay)
@@ -121,32 +123,29 @@ class ZmqRPCServer(Component):
         except NotConnected:
             logger.error('cannot send message (no connection): %s', msg)
             return
-        self.send_sock.send(connection.endpoint.encode('utf-8'), flags=zmq.SNDMORE)
+        self.send_sock.send(connection.endpoint.encode('utf-8'),
+                            flags=zmq.SNDMORE)
         self.send_sock.send_multipart(msg.pack_frames())
         logger.debug('-> %s to %s', msg, connection.endpoint)
         connection.on_send(msg)
 
     def send_request(self, address, subject, body, headers=None):
-        msg = Message(
-            msg_type=Message.REQ,
-            subject=subject,
-            body=body,
-            source=self.endpoint,
-            headers=self.container.prepare_headers(headers),
-        )
+        msg = Message(msg_type=Message.REQ,
+                      subject=subject,
+                      body=body,
+                      source=self.endpoint,
+                      headers=self.container.prepare_headers(headers),)
         channel = RequestChannel(msg, self)
         self.channels[msg.id] = channel
         self._send_message(address, msg)
         return channel
 
     def send_reply(self, msg, body, msg_type=Message.REP, headers=None):
-        reply_msg = Message(
-            msg_type=msg_type,
-            subject=msg.id,
-            body=body,
-            source=self.endpoint,
-            headers=self.container.prepare_headers(headers),
-        )
+        reply_msg = Message(msg_type=msg_type,
+                            subject=msg.id,
+                            body=body,
+                            source=self.endpoint,
+                            headers=self.container.prepare_headers(headers),)
         self._send_message(msg.source, reply_msg)
         return reply_msg
 
@@ -184,7 +183,8 @@ class ZmqRPCServer(Component):
                 logger.exception('failed to send automatic NACK')
         finally:
             elapsed = time.time() - start
-            logger.log(loglevel, 'subject=%s duration=%f (seconds)', msg.subject, elapsed)
+            logger.log(loglevel, 'subject=%s duration=%f (seconds)',
+                       msg.subject, elapsed)
 
     def _get_loglevel(self, msg):
         return logging.DEBUG if msg.subject == 'lymph.ping' else logging.INFO
@@ -200,11 +200,13 @@ class ZmqRPCServer(Component):
             try:
                 channel = self.channels[msg.subject]
             except KeyError:
-                logger.debug('reply to unknown subject: %s (msg-id=%s)', msg.subject, msg.id)
+                logger.debug('reply to unknown subject: %s (msg-id=%s)',
+                             msg.subject, msg.id)
                 return
             channel.recv(msg)
         else:
-            logger.warning('unknown message type: %s (msg-id=%s)', msg.type, msg.id)
+            logger.warning('unknown message type: %s (msg-id=%s)', msg.type,
+                           msg.id)
 
     def _recv_loop(self):
         while True:
@@ -213,7 +215,8 @@ class ZmqRPCServer(Component):
                 msg = Message.unpack_frames(frames)
             except ValueError as e:
                 msg_id = frames[1] if len(frames) >= 2 else None
-                logger.warning('bad message format %s: %r (msg-id=%s)', e, (frames), msg_id)
+                logger.warning('bad message format %s: %r (msg-id=%s)', e,
+                               (frames), msg_id)
                 continue
             self.recv_message(msg)
 

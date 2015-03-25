@@ -14,7 +14,6 @@ from lymph.core.trace import Group
 from lymph.web.wsgi_server import LymphWSGIServer
 from lymph.web.routing import HandledRule
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -30,7 +29,8 @@ class WebServiceInterface(Interface):
         self.application = Request.application(self.dispatch_request)
         if self.container.debug:
             from werkzeug.debug import DebuggedApplication
-            self.application = DebuggedApplication(self.application, evalex=True)
+            self.application = DebuggedApplication(self.application,
+                                                   evalex=True)
         self.wsgi_server = None
 
     def __call__(self, *args, **kwargs):
@@ -49,12 +49,15 @@ class WebServiceInterface(Interface):
         try:
             socket_fd = self.container.get_shared_socket_fd(self.http_port)
         except SocketNotCreated:
-            logger.warning("socket for port %s wasn't created by node, binding from instance instead", self.http_port)
+            logger.warning(
+                "socket for port %s wasn't created by node, binding from instance instead",
+                self.http_port)
             address = '%s:%s' % (self.container.server.ip, self.http_port)
             self.http_socket = create_socket(address)
         else:
             self.http_socket = create_socket('fd://%s' % socket_fd)
-        self.wsgi_server = LymphWSGIServer(self.http_socket, self.application, spawn=Group(self.pool_size))
+        self.wsgi_server = LymphWSGIServer(self.http_socket, self.application,
+                                           spawn=Group(self.pool_size))
         self.wsgi_server.start()
 
     def on_stop(self, **kwargs):

@@ -19,7 +19,6 @@ from lymph.core.interfaces import DefaultInterface
 from lymph.core.plugins import Hook
 from lymph.core import trace
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -30,8 +29,7 @@ def create_container(config):
         'container',
         default_class='lymph.core.container:ServiceContainer',
         registry=registry,
-        events=event_system,
-    )
+        events=event_system,)
     return container
 
 
@@ -39,7 +37,17 @@ class ServiceContainer(Componentized):
 
     server_cls = ZmqRPCServer
 
-    def __init__(self, ip='127.0.0.1', port=None, registry=None, events=None, node_endpoint=None, log_endpoint=None, service_name=None, debug=False, monitor_endpoint=None, pool_size=None):
+    def __init__(self,
+                 ip='127.0.0.1',
+                 port=None,
+                 registry=None,
+                 events=None,
+                 node_endpoint=None,
+                 log_endpoint=None,
+                 service_name=None,
+                 debug=False,
+                 monitor_endpoint=None,
+                 pool_size=None):
         super(ServiceContainer, self).__init__()
         self.node_endpoint = node_endpoint
         self.log_endpoint = log_endpoint
@@ -64,7 +72,9 @@ class ServiceContainer(Componentized):
             self.add_component(events)
             events.install(self)
         self.server = self.install(self.server_cls, ip=ip, port=port)
-        self.monitor = self.install(MonitorPusher, endpoint=monitor_endpoint, interval=5)
+        self.monitor = self.install(MonitorPusher,
+                                    endpoint=monitor_endpoint,
+                                    interval=5)
         self.monitor.add_tags(service=self.service_name, host=self.fqdn)
         self.metrics.add(self.raw_metrics)
         self.install_interface(DefaultInterface, name='lymph')
@@ -83,7 +93,8 @@ class ServiceContainer(Componentized):
         return cls(**kwargs)
 
     def excepthook(self, type, value, traceback):
-        logger.log(logging.CRITICAL, 'Uncaught exception', exc_info=(type, value, traceback))
+        logger.log(logging.CRITICAL, 'Uncaught exception',
+                   exc_info=(type, value, traceback))
         self.error_hook((type, value, traceback))
 
     @property
@@ -103,6 +114,7 @@ class ServiceContainer(Componentized):
             except:
                 self.error_hook(sys.exc_info())
                 raise
+
         return self.pool.spawn(_inner)
 
     def install_interface(self, cls, **kwargs):
@@ -147,19 +159,22 @@ class ServiceContainer(Componentized):
         }
 
     def start(self, register=True):
-        logger.info('starting %s (%s) at %s (pid=%s)', self.service_name, ', '.join(self.service_types), self.endpoint, os.getpid())
+        logger.info('starting %s (%s) at %s (pid=%s)', self.service_name,
+                    ', '.join(self.service_types), self.endpoint, os.getpid())
 
         self.on_start()
         self.monitor.add_tags(identity=self.identity)
 
         if register:
-            for interface_name, service in six.iteritems(self.installed_interfaces):
+            for interface_name, service in six.iteritems(
+                self.installed_interfaces):
                 if not service.register_with_coordinator:
                     continue
                 try:
                     self.service_registry.register(interface_name)
                 except RegistrationFailure:
-                    logger.error("registration failed %s, %s", interface_name, service)
+                    logger.error("registration failed %s, %s", interface_name,
+                                 service)
                     self.stop()
 
     def stop(self, **kwargs):
@@ -197,7 +212,9 @@ class ServiceContainer(Componentized):
 
     def emit_event(self, event_type, payload, headers=None):
         headers = self.prepare_headers(headers)
-        event = Event(event_type, payload, source=self.identity, headers=headers)
+        event = Event(event_type, payload,
+                      source=self.identity,
+                      headers=headers)
         self.event_system.emit(event)
 
     def send_request(self, address, subject, body, headers=None):

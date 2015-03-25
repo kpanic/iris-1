@@ -6,7 +6,6 @@ import logging
 from lymph.client import Client
 from lymph.cli.base import Command
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -49,11 +48,9 @@ class ShellCommand(Command):
             IPython = None
 
         if IPython:
-            IPython.start_ipython(
-                argv=[],
-                user_ns=imported_objects,
-                banner1='Welcome to the lymph shell'
-            )
+            IPython.start_ipython(argv=[],
+                                  user_ns=imported_objects,
+                                  banner1='Welcome to the lymph shell')
         else:
             import code
             code.interact(local=imported_objects)
@@ -71,7 +68,8 @@ class ShellCommand(Command):
         try:
             name, identity_prefix = service_fullname.split(':')
         except ValueError:
-            sys.exit("Malformed argument it should be in the format 'name:identity'")
+            sys.exit(
+                "Malformed argument it should be in the format 'name:identity'")
         service = self.client.container.lookup(name)
         instance = service.get_instance(identity_prefix)
         if instance is None:

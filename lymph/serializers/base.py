@@ -10,6 +10,7 @@ import uuid
 
 @six.add_metaclass(abc.ABCMeta)
 class ExtensionTypeSerializer(object):
+
     @abc.abstractmethod
     def serialize(self, obj):
         raise NotImplementedError
@@ -109,11 +110,16 @@ class BaseSerializer(object):
         return self._load(f, object_hook=self.load_object)
 
 
-msgpack_serializer = BaseSerializer(
-    dumps=functools.partial(msgpack.dumps, use_bin_type=True),
-    loads=functools.partial(msgpack.loads, encoding='utf-8'),
-    dump=functools.partial(msgpack.dump, use_bin_type=True),
-    load=functools.partial(msgpack.load, encoding='utf-8'),
-)
+msgpack_serializer = BaseSerializer(dumps=functools.partial(msgpack.dumps,
+                                                            use_bin_type=True),
+                                    loads=functools.partial(msgpack.loads,
+                                                            encoding='utf-8'),
+                                    dump=functools.partial(msgpack.dump,
+                                                           use_bin_type=True),
+                                    load=functools.partial(msgpack.load,
+                                                           encoding='utf-8'),)
 
-json_serializer = BaseSerializer(dumps=json.dumps, loads=json.loads, dump=json.dump, load=json.load)
+json_serializer = BaseSerializer(dumps=json.dumps,
+                                 loads=json.loads,
+                                 dump=json.dump,
+                                 load=json.load)

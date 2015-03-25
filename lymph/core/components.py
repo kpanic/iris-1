@@ -43,7 +43,8 @@ class ComponentizedBase(type):
             if isinstance(value, Declaration):
                 value.name = name
                 declarations.add(value)
-        new_cls = super(ComponentizedBase, cls).__new__(cls, clsname, bases, attrs)
+        new_cls = super(ComponentizedBase, cls).__new__(cls, clsname, bases,
+                                                        attrs)
         new_cls.declarations = declarations
         return new_cls
 

@@ -7,7 +7,6 @@ import six
 from lymph.utils import observables
 from lymph.exceptions import NotConnected
 
-
 logger = logging.getLogger(__name__)
 
 # Event types propagated by Service when instances change.
@@ -19,7 +18,8 @@ UPDATED = 'UPDATED'
 class ServiceInstance(object):
     def __init__(self, container, endpoint=None, identity=None, **info):
         self.container = container
-        self.identity = identity if identity else hashlib.md5(endpoint.encode('utf-8')).hexdigest()
+        self.identity = identity if identity else hashlib.md5(
+            endpoint.encode('utf-8')).hexdigest()
         self.update(endpoint, **info)
         self.connection = None
 
@@ -41,7 +41,6 @@ class ServiceInstance(object):
 
 
 class Service(observables.Observable):
-
     def __init__(self, container, name=None, instances=()):
         super(Service, self).__init__()
         self.container = container
@@ -90,5 +89,6 @@ class Service(observables.Observable):
             self.instances[identity].update(**info)
             self.notify_observers(UPDATED, self.instances[identity])
         else:
-            instance = self.instances[identity] = ServiceInstance(self.container, **info)
+            instance = self.instances[identity] = ServiceInstance(
+                self.container, **info)
             self.notify_observers(ADDED, instance)

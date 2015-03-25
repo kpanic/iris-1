@@ -9,8 +9,4 @@ class Geocoder(lymph.Interface):
     @lymph.rpc()
     def geocode(self, address):
         matched_address, (lat, lng) = self.geolocator.geocode(address)
-        return {
-            'address': matched_address,
-            'latitude': lat,
-            'longitude': lng,
-        }
+        return {'address': matched_address, 'latitude': lat, 'longitude': lng,}

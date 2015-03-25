@@ -43,6 +43,7 @@ class _RemoteException(type):
 
 @six.add_metaclass(_RemoteException)
 class RemoteError(RpcRequestError):
+
     @classmethod
     def from_reply(cls, request, reply):
         errtype = reply.body.get('type', cls.__name__)

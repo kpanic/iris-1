@@ -4,12 +4,12 @@ import textwrap
 import pkg_resources
 import logging
 
-
 logger = logging.getLogger(__name__)
 
-
-docstring_format_vars = {k: textwrap.dedent(v).strip() for k, v in six.iteritems({
-    'COMMON_OPTIONS': """
+docstring_format_vars = {
+    k: textwrap.dedent(v).strip()
+    for k, v in six.iteritems({
+        'COMMON_OPTIONS': """
 Common Options:
   --config=<file>, -c <file>   Load configuration from the given path.
   --help, -h                   Print this help message and exit.
@@ -20,7 +20,7 @@ Common Options:
   --color                      Force colored output.
   --no-color                   Disable colored output.
     """,
-    'INSTANCE_OPTIONS': """
+        'INSTANCE_OPTIONS': """
 Instance Options:
   --isolated, -i               Don't register this service.
   --port=<port>, -p <port>     Use this port for the RPC endpoint.
@@ -32,7 +32,8 @@ Instance Options:
                                change. The process will be restarted by the
                                node. Do not use this in production.
     """,
-})}
+    })
+}
 
 
 def format_docstring(doc):
@@ -83,7 +84,9 @@ def get_command_classes():
         for entry_point in pkg_resources.iter_entry_points('lymph.cli'):
             name = entry_point.name
             if name in entry_points:
-                logger.error('ignoring duplicate command definition for %s (already installed: %s)', entry_point, entry_points[name])
+                logger.error(
+                    'ignoring duplicate command definition for %s (already installed: %s)',
+                    entry_point, entry_points[name])
                 continue
             entry_points[name] = entry_point
             cls = entry_point.load()
@@ -94,4 +97,3 @@ def get_command_classes():
 
 def get_command_class(name):
     return get_command_classes()[name]
-

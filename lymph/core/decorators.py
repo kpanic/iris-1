@@ -35,8 +35,8 @@ class RPCBase(collections.Callable):
         self.original = func
         self._func = func
 
-        functools.update_wrapper(
-            self, func, assigned=functools.WRAPPER_ASSIGNMENTS)
+        functools.update_wrapper(self, func,
+                                 assigned=functools.WRAPPER_ASSIGNMENTS)
 
     @property
     def args(self):
@@ -77,7 +77,6 @@ class _RawRPCDecorator(RPCBase):
 
 
 class _RPCDecorator(RPCBase):
-
     def __init__(self, *args, **kwargs):
         self._raises = kwargs.pop('raises', ())
         super(_RPCDecorator, self).__init__(*args, **kwargs)
@@ -111,6 +110,7 @@ def event(*event_types, **kwargs):
 
         def factory(interface):
             return EventHandler(interface, func, event_types, **kwargs)
-        return Declaration(factory)
-    return decorator
 
+        return Declaration(factory)
+
+    return decorator

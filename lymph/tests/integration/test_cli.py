@@ -52,28 +52,33 @@ class ListCommandTests(CliTestMixin, unittest.TestCase):
             instance          Run a single service instance (one process).
             node              Run a node service that manages a group of processes on the same machine.
             shell             Open an interactive Python shell locally or remotely.
-        """, config=False)
+        """,
+                                config=False)
 
 
 class HelpCommandTests(CliTestMixin, unittest.TestCase):
     def test_help(self):
-        self.assert_first_line_equals(['help'], 'Usage: lymph [options] <command> [<args>...]', config=False)
+        self.assert_first_line_equals([
+            'help'
+        ], 'Usage: lymph [options] <command> [<args>...]',
+                                      config=False)
 
     def test_help_list(self):
-        self.assert_first_line_equals(['help', 'list'], 'Usage: lymph list [options]', config=False)
+        self.assert_first_line_equals(['help',
+                                       'list'], 'Usage: lymph list [options]',
+                                      config=False)
 
 
 class ServiceCommandTests(CliIntegrationTestCase):
     def test_instance(self):
         self.cli_config['interfaces'] = {
-            'echo': {
-                'class': 'lymph.tests.integration.test_cli:Upper',
-            }
+            'echo': {'class': 'lymph.tests.integration.test_cli:Upper',}
         }
         command_greenlet = gevent.spawn(self.cli, ['instance'])
         client = self.create_client()
-        gevent.sleep(1)  # FIXME: how can we wait for the instance to register?
-        response = client.request('echo', 'echo.upper', {'text': 'hi'}, timeout=1)
+        gevent.sleep(1) # FIXME: how can we wait for the instance to register?
+        response = client.request('echo', 'echo.upper', {'text': 'hi'},
+                                  timeout=1)
         self.assertEqual(response.body, 'HI')
         command_greenlet.kill()
         command_greenlet.join()

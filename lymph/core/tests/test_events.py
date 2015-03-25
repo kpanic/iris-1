@@ -22,15 +22,15 @@ class EventDispatcherTest(unittest.TestCase):
 
     def assert_dispatched_patterns_equal(self, event_type, patterns):
         self.assertEqual(
-            set(pattern for pattern, handler in self.dispatcher.dispatch(event_type)),
-            set(patterns),
-        )
+            set(pattern
+                for pattern, handler in self.dispatcher.dispatch(event_type)),
+            set(patterns),)
 
     def assert_dispatched_handlers_equal(self, event_type, handlers):
         self.assertEqual(
-            set(handler.__name__ for pattern, handler in self.dispatcher.dispatch(event_type)),
-            set(handlers),
-        )
+            set(handler.__name__
+                for pattern, handler in self.dispatcher.dispatch(event_type)),
+            set(handlers),)
 
     def test_basic_dispatch(self):
         self.dispatcher.register('foo', self.make_handler('foo'))
@@ -51,7 +51,8 @@ class EventDispatcherTest(unittest.TestCase):
         self.dispatcher.register('foo.#', self.make_handler('foo_hash'))
 
         self.assert_dispatched_patterns_equal('foo', {'foo', '*', '#'})
-        self.assert_dispatched_patterns_equal('foo.bar', {'#', 'foo.*', 'foo.#'})
+        self.assert_dispatched_patterns_equal('foo.bar',
+                                              {'#', 'foo.*', 'foo.#'})
         self.assert_dispatched_patterns_equal('foo.bar.baz', {'#', 'foo.#'})
         self.assert_dispatched_patterns_equal('', {'#'})
 
@@ -71,5 +72,6 @@ class EventDispatcherTest(unittest.TestCase):
         ed.register('bar', self.make_handler('bar'))
         self.dispatcher.update(ed)
 
-        self.assert_dispatched_handlers_equal('foo', {'foo', 'base_foo', 'hash'})
+        self.assert_dispatched_handlers_equal('foo',
+                                              {'foo', 'base_foo', 'hash'})
         self.assert_dispatched_handlers_equal('bar', {'hash', 'bar'})

@@ -14,7 +14,6 @@ from lymph.cli.base import Command
 from lymph.core.container import create_container
 from lymph.utils.sockets import get_unused_port
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -97,19 +96,26 @@ class InstanceCommand(Command):
 
         backdoor = BackdoorServer(
             endpoint,
-            locals={'container': self.container, 'dump_stacks': dump_stacks},
+            locals={'container': self.container,
+                    'dump_stacks': dump_stacks},
             banner=banner)
         gevent.spawn(backdoor.serve_forever)
 
         self.container.backdoor_endpoint = endpoint
 
     def _register_signals(self):
-        gevent.signal(signal.SIGINT, self._handle_termination_signal, signal.SIGINT)
-        gevent.signal(signal.SIGTERM, self._handle_termination_signal, signal.SIGTERM)
-        gevent.signal(signal.SIGQUIT, self._handle_termination_signal, signal.SIGQUIT, prehook=partial(dump_stacks, output=sys.stderr.write))
+        gevent.signal(signal.SIGINT, self._handle_termination_signal,
+                      signal.SIGINT)
+        gevent.signal(signal.SIGTERM, self._handle_termination_signal,
+                      signal.SIGTERM)
+        gevent.signal(signal.SIGQUIT, self._handle_termination_signal,
+                      signal.SIGQUIT,
+                      prehook=partial(dump_stacks,
+                                      output=sys.stderr.write))
 
     def _handle_termination_signal(self, signalnum, prehook=None):
-        logger.info('caught %s, pid=%s', signal.getsignal(signalnum), os.getpid())
+        logger.info('caught %s, pid=%s', signal.getsignal(signalnum),
+                    os.getpid())
         if prehook:
             prehook()
         self.container.stop(signalnum=signalnum)
@@ -117,11 +123,9 @@ class InstanceCommand(Command):
         sys.exit(0)
 
     def _set_process_title(self):
-        setproctitle('lymph-instance (identity: %s, endpoint: %s, config: %s)' % (
-            self.container.identity,
-            self.container.endpoint,
-            self.config.source,
-        ))
+        setproctitle('lymph-instance (identity: %s, endpoint: %s, config: %s)' %
+                     (self.container.identity, self.container.endpoint,
+                      self.config.source,))
 
 
 class NodeCommand(InstanceCommand):
@@ -148,4 +152,3 @@ class NodeCommand(InstanceCommand):
         })
         os.environ['LYMPH_NODE_CONFIG'] = self.config.source
         super(NodeCommand, self).run()
-

@@ -4,7 +4,6 @@ import logging
 import six
 import uuid
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -48,22 +47,18 @@ class EventIndex(object):
             'source': event.source,
             'logged_at': datetime.utcnow(),
         })
-        self.es.index(
-            index=index_name or self.index_name,
-            doc_type='event',
-            id=event_id,
-            body=body,
-        )
+        self.es.index(index=index_name or self.index_name,
+                      doc_type='event',
+                      id=event_id,
+                      body=body,)
 
 
 class DatedEventIndex(EventIndex):
     def create_index_alias(self):
         if self.es.indices.exists_alias(self.index_name):
             logger.info('index alias already exists')
-        self.es.indices.put_alias(
-            index='%s-*' % self.index_name,
-            name=self.index_name,
-        )
+        self.es.indices.put_alias(index='%s-*' % self.index_name,
+                                  name=self.index_name,)
 
     def get_index_name(self, dt):
         return '%s-%s' % (self.index_name, dt.strftime('%Y.%m.%d'))
@@ -71,4 +66,3 @@ class DatedEventIndex(EventIndex):
     def index(self, event, index_name=None):
         index_name = self.get_index_name(datetime.now())
         super(DatedEventIndex, self).index(event, index_name)
-

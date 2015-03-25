@@ -22,5 +22,3 @@ class Client(object):
     def __getattr__(self, name):
         # FIXME: explicit is better than implicit
         return getattr(self.interface, name)
-
-

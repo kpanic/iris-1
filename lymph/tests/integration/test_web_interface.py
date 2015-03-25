@@ -22,20 +22,21 @@ class HandledRuleHandler(RequestHandler):
 
 
 class Web(WebServiceInterface):
-    url_map = Map([
-        Rule("/test/", endpoint="test"),
-        Rule("/foo/", endpoint=RuleHandler),
-        HandledRule("/bar/", endpoint="bar", handler=HandledRuleHandler),
-        Rule("/fail/", endpoint="fail"),
-        Rule("/fail-wrong-endpoint/", endpoint=42),
-    ])
+    url_map = Map([Rule("/test/",
+                        endpoint="test"), Rule("/foo/",
+                                               endpoint=RuleHandler),
+                   HandledRule("/bar/",
+                               endpoint="bar",
+                               handler=HandledRuleHandler),
+                   Rule("/fail/",
+                        endpoint="fail"), Rule("/fail-wrong-endpoint/",
+                                               endpoint=42),])
 
     def test(self, request):
         return Response("method test")
 
 
 class WebIntegrationTest(unittest.TestCase):
-
     def setUp(self):
         super(WebIntegrationTest, self).setUp()
         container = mock.Mock()

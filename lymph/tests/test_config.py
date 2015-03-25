@@ -10,21 +10,14 @@ class ConfigurationTests(unittest.TestCase):
         return Configuration(yaml.load(textwrap.dedent(yml)))
 
     def test_setdefault_without_previous_value(self):
-        config = Configuration({
-            'nested': {}
-        })
+        config = Configuration({'nested': {}})
         config.setdefault('foo', 1)
         self.assertEqual(config.get('foo'), 1)
         config.setdefault('nested.foo', 2)
         self.assertEqual(config.get('nested.foo'), 2)
 
     def test_setdefault_with_previous_value(self):
-        config = Configuration({
-            'foo': 1,
-            'nested': {
-                'foo': 2
-            }
-        })
+        config = Configuration({'foo': 1, 'nested': {'foo': 2}})
         config.setdefault('foo', 0)
         self.assertEqual(config.get('foo'), 1)
         config.setdefault('nested.foo', 0)
@@ -69,15 +62,11 @@ class ConfigurableThing(object):
 
 class CreateInstanceTest(unittest.TestCase):
     config = Configuration({
-        "thing": {
-            "class": "%s:ConfigurableThing" % __name__,
-            "param": 41
-        },
+        "thing": {"class": "%s:ConfigurableThing" % __name__,
+                  "param": 41},
         "section": {
-            "thing": {
-                "class": "%s:ConfigurableThing" % __name__,
-                "param": 42
-            },
+            "thing": {"class": "%s:ConfigurableThing" % __name__,
+                      "param": 42},
         }
     })
 
@@ -94,11 +83,8 @@ class CreateInstanceTest(unittest.TestCase):
 
 
 class GetInstanceTest(unittest.TestCase):
-    config = Configuration({
-        "thing": {
-            "class": "%s:ConfigurableThing" % __name__,
-        }
-    })
+    config = Configuration(
+        {"thing": {"class": "%s:ConfigurableThing" % __name__,}})
 
     def test_creates_instance_based_on_configuration(self):
         instance = self.config.get_instance("thing")
@@ -113,13 +99,9 @@ class GetInstanceTest(unittest.TestCase):
 class GetDependencyTest(unittest.TestCase):
     config = Configuration({
         "dependencies": {
-            "thing": {
-                "class": "%s:ConfigurableThing" % __name__
-            },
+            "thing": {"class": "%s:ConfigurableThing" % __name__},
         },
-        "key": {
-            "client": "dep:thing",
-        }
+        "key": {"client": "dep:thing",}
     })
 
     def test_creates_instance_based_on_configuration(self):

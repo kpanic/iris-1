@@ -13,5 +13,7 @@ def _load_json(s):
     return json_serializer.load(BytesIO(s))
 
 
-json_serializer_args = (json_serializer.dumps, _load_json, 'application/lymph+json', 'utf-8')
-msgpack_serializer_args = (msgpack_serializer.dumps, _load_msgpack, 'application/lymph+x-msgpack', 'binary')
+json_serializer_args = (json_serializer.dumps, _load_json,
+                        'application/lymph+json', 'utf-8')
+msgpack_serializer_args = (msgpack_serializer.dumps, _load_msgpack,
+                           'application/lymph+x-msgpack', 'binary')

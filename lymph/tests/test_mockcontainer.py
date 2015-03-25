@@ -49,7 +49,8 @@ class BasicMockTest(unittest.TestCase):
     def setUp(self):
         self.network = MockServiceNetwork()
         self.upper_container = self.network.add_service(Upper, 'upper')
-        self.client_container = self.network.add_service(ClientInterface, 'client')
+        self.client_container = self.network.add_service(ClientInterface,
+                                                         'client')
         self.network.start()
         self.client = self.client_container.installed_interfaces['client']
 
@@ -62,7 +63,8 @@ class BasicMockTest(unittest.TestCase):
         self.assertEqual(reply.body, 'FOO')
 
     def test_indirect_upper(self):
-        reply = self.client.request('upper', 'upper.indirect_upper', {'text': 'foo'})
+        reply = self.client.request('upper', 'upper.indirect_upper',
+                                    {'text': 'foo'})
         self.assertEqual(reply.body, 'FOO')
 
     def test_ping(self):
@@ -70,7 +72,8 @@ class BasicMockTest(unittest.TestCase):
         self.assertEqual(reply.body, 42)
 
     def test_status(self):
-        reply = self.client.request(self.upper_container.endpoint, 'lymph.status', {})
+        reply = self.client.request(self.upper_container.endpoint,
+                                    'lymph.status', {})
         self.assertEqual(reply.body, {
             'endpoint': 'mock://300.0.0.1:1',
             'identity': '252946e723b6b07c1f5f0aa9442fb348',
@@ -85,12 +88,14 @@ class BasicMockTest(unittest.TestCase):
             self.client.request(self.upper_container.endpoint, 'upper.fail', {})
 
     def test_ack(self):
-        reply = self.client.request(self.upper_container.endpoint, 'upper.just_ack', {})
+        reply = self.client.request(self.upper_container.endpoint,
+                                    'upper.just_ack', {})
         self.assertIsNone(reply.body)
         self.assertEqual(reply.type, Message.ACK)
 
     def test_auto_nack(self):
-        self.assertRaises(Nack, self.client.request, self.upper_container.endpoint, 'upper.auto_nack', {})
+        self.assertRaises(Nack, self.client.request,
+                          self.upper_container.endpoint, 'upper.auto_nack', {})
 
     def test_events(self):
         log = self.upper_container.installed_interfaces['upper'].eventlog
@@ -107,7 +112,7 @@ class BasicMockTest(unittest.TestCase):
     def test_inspect(self):
         proxy = self.client.proxy('upper', namespace='lymph')
         methods = proxy.inspect()['methods']
-        self.assertEqual(set(m['name'] for m in methods), set([
-            'upper.fail', 'upper.upper', 'upper.auto_nack', 'upper.just_ack',
-            'lymph.status', 'lymph.inspect', 'lymph.ping', 'upper.indirect_upper'
-        ]))
+        self.assertEqual(set(m['name'] for m in methods),
+                         set(['upper.fail', 'upper.upper', 'upper.auto_nack',
+                              'upper.just_ack', 'lymph.status', 'lymph.inspect',
+                              'lymph.ping', 'upper.indirect_upper']))
